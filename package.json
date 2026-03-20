@@ -1,0 +1,15 @@
+{
+  "name": "the-corporate-blog",
+  "version": "1.0.0",
+  "description": "The Corporate Blog - Full Stack Platform",
+  "private": true,
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "setup": "npm run install:all && cd backend && cp .env.example .env && cd ../frontend && cp .env.example .env.local",
+    "db:migrate": "cd backend && npx prisma migrate dev --name init",
+    "db:seed": "cd backend && npm run prisma:seed",
+    "db:studio": "cd backend && npm run prisma:studio"
+  }
+}

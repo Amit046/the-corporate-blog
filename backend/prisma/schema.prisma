@@ -1,0 +1,148 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  WRITER
+  VIEWER
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String?
+  name          String
+  slug          String    @unique
+  bio           String?
+  avatar        String?
+  role          Role      @default(WRITER)
+  googleId      String?   @unique
+  refreshTokens RefreshToken[]
+  posts         Post[]
+  auditLogs     AuditLog[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
+  @@index([slug])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+}
+
+model Category {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  slug        String         @unique
+  description String?
+  postCategories PostCategory[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([slug])
+}
+
+model Post {
+  id              String         @id @default(uuid())
+  title           String
+  slug            String         @unique
+  excerpt         String?
+  content         Json           // Block-based JSON content
+  bannerImage     String?
+  bannerImageAlt  String?
+  status          PostStatus     @default(DRAFT)
+  seoTitle        String?
+  seoDescription  String?
+  canonicalUrl    String?
+  isSponsored     Boolean        @default(false)
+  readingTime     Int?           // minutes
+  wordCount       Int?
+  publishedAt     DateTime?
+  scheduledAt     DateTime?
+  authorId        String
+  author          User           @relation(fields: [authorId], references: [id])
+  categories      PostCategory[]
+  views           PostView[]
+  affiliateLinks  AffiliateLink[]
+  auditLogs       AuditLog[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+}
+
+model PostCategory {
+  postId     String
+  categoryId String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+}
+
+model PostView {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ipHash    String
+  userAgent String?
+  viewedAt  DateTime @default(now())
+
+  @@unique([postId, ipHash, viewedAt])
+  @@index([postId])
+}
+
+model AffiliateLink {
+  id         String   @id @default(uuid())
+  slug       String   @unique
+  targetUrl  String
+  postId     String?
+  post       Post?    @relation(fields: [postId], references: [id])
+  clicks     Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([slug])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id])
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityId])
+}
