@@ -3,17 +3,21 @@
   "version": "1.0.0",
   "description": "The Corporate Blog - Backend API",
   "main": "dist/index.js",
+
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts"
   },
+
   "dependencies": {
     "@prisma/client": "^5.10.0",
+
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
@@ -28,9 +32,8 @@
     "slug": "^9.1.0",
     "uuid": "^9.0.1",
     "winston": "^3.12.0",
-    "zod": "^3.22.4"
-  },
-  "devDependencies": {
+    "zod": "^3.22.4",
+
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.7",
@@ -41,6 +44,10 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.28",
     "@types/uuid": "^9.0.8",
+    "@types/slug": "^5.0.6"
+  },
+
+  "devDependencies": {
     "prisma": "^5.10.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
